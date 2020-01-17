@@ -11,11 +11,11 @@ namespace Snet.Framework
 {
     public class SNetCore : SNetCoreProcedures
     {
-        internal UdpClient UdpClientSocket;
-        internal TcpClient TcpClientSocket;
+        internal static UdpClient UdpClientSocket;
+        internal static TcpClient TcpClientSocket;
 
-        internal UdpClient UdpServerSocket;
-        internal TcpClient TcpServerSocket;
+        internal static UdpClient UdpServerSocket;
+        internal static TcpClient TcpServerSocket;
 
         public static byte[] Packaging(object data)
         {
