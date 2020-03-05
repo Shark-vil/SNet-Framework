@@ -11,58 +11,29 @@ namespace Snet.Framework
 {
     public class SNetCore : SNetCoreProcedures
     {
+        public static bool IsClient = false;
+        public static bool IsServer = false;
+        public static bool IsHost = false;
+
         internal static UdpClient UdpClientSocket;
         internal static TcpClient TcpClientSocket;
 
         internal static UdpClient UdpServerSocket;
         internal static TcpClient TcpServerSocket;
 
-        public static byte[] Packaging(object data)
+        public static bool IsGameServer()
         {
-            try
-            {
-                BinaryFormatter Formatter = new BinaryFormatter();
-                using (MemoryStream Stream = new MemoryStream())
-                {
-                    Formatter.Serialize(Stream, data);
-                    return Stream.ToArray();
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"An exception while packing the object data.\nError code:\n" + ex);
-                return null;
-            }
+            return IsServer;
         }
 
-        public static T Unpacking<T>(byte[] Data)
+        public static bool IsGameClient()
         {
-            try
-            {
-                BinaryFormatter Formatter = new BinaryFormatter();
-                MemoryStream Stream = new MemoryStream(Data);
-
-                Stream.Seek(0, SeekOrigin.Begin);
-                object Component = Formatter.Deserialize(Stream);
-                Stream.Position = 0;
-                Stream.Close();
-
-                return (T)Component;
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("An exception while trying to unpack the object data.\nError code:\n" + ex);
-                return default;
-            }
+            return IsClient;
         }
 
-        public static bool IsUnityServer()
+        public static bool IsGameHost()
         {
-#if UNITY_SERVER
-            return true;
-#else
-            return false;
-#endif
+            return IsHost;
         }
     }
 }
