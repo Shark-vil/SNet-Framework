@@ -8,10 +8,10 @@ namespace Snet.Templates
     public class TemplateReceiver
     {
         [SerializeField]
-        public string Type;
+        public string NetworkKey;
         [SerializeField]
-        public string Name;
+        public byte[] DataBytes;
         [SerializeField]
-        public byte[] Data;
+        public bool IsSecure;
     }
 }

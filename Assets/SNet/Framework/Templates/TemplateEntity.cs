@@ -10,6 +10,8 @@ namespace Snet.Templates
         [SerializeField]
         public int Id;
         [SerializeField]
+        public bool MainCharacter;
+        [SerializeField]
         public bool IsMap;
         [SerializeField]
         public int OwnerId;

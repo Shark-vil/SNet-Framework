@@ -1,22 +1,21 @@
 ﻿using Snet.Framework;
-using Snet.Templates;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using UnityEngine;
+using Snet.Templates;
 
-namespace Snet.Server
+namespace Snet.Client
 {
-    public class SNetServerProcess : SNetCore
+    public class SNetClientProcess : SNetCore
     {
         public static object IsLock = new object();
 
         public static bool IsEngine = false;
 
-        public static IPEndPoint ClientEndPoint = null;
-        //public static TemplateReceiver Receive = null;
+        public static IPEndPoint ServerEndPoint = null;
         public static List<TemplateReceiver> Receives = new List<TemplateReceiver>();
 
         public static Thread ServerThread;
@@ -49,17 +48,10 @@ namespace Snet.Server
         {
             while (true)
             {
-                //Receive = null;
-
-                UdpReceiveResult Result = await ServerSocket.ReceiveAsync();
-                ClientEndPoint = Result.RemoteEndPoint;
+                UdpReceiveResult Result = await ClientSocket.ReceiveAsync();
+                ServerEndPoint = Result.RemoteEndPoint;
 
                 TemplateReceiver Receive = Framework.Utilities.SNetPackage.Unpacking<TemplateReceiver>(Result.Buffer);
-
-                if (Receive.NetworkKey == "Player.Connect")
-                {
-                    SNetGlobalData.AddPlayer(Receive, ClientEndPoint);
-                }
 
                 if (Receive.IsGaranted)
                     Receives.Add(Receive);

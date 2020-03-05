@@ -4,38 +4,50 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-public class SNetWriter : MonoBehaviour, IDisposable
+namespace Snet.Framework.Utilities
 {
-    public MemoryStream Stream = null;
-    public BinaryWriter Writer = null;
-
-    public SNetWriter()
+    public class SNetWriter : IDisposable
     {
-        Stream = new MemoryStream();
-        Writer = new BinaryWriter(Stream);
-    }
+        public MemoryStream Stream = null;
+        public BinaryWriter Writer = null;
+        public BinaryReader Reader = null;
 
-    public byte[] SaveWriter()
-    {
-        try
+        public SNetWriter(byte[] DataBytes = null)
         {
+            if (DataBytes != null)
+            {
+                Stream = new MemoryStream(DataBytes);
+                Reader = new BinaryReader(Stream);
+            }
+            else
+            {
+                Stream = new MemoryStream();
+                Writer = new BinaryWriter(Stream);
+            }
+        }
+
+        public byte[] SaveWriter()
+        {
+            try
+            {
+                if (Reader == null && Stream != null)
+                    return Stream.ToArray();
+            }
+            catch (Exception ex)
+            {
+                // Error
+            }
+
+            return null;
+        }
+
+        public void Dispose()
+        {
+            if (Writer != null)
+                Writer.Close();
+
             if (Stream != null)
-                return Stream.ToArray();
+                Stream.Close();
         }
-        catch (Exception ex)
-        {
-            // Error
-        }
-
-        return null;
-    }
-
-    public void Dispose()
-    {
-        if (Writer != null)
-            Writer.Close();
-
-        if (Stream != null)
-            Stream.Close();
     }
 }

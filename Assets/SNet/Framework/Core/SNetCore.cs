@@ -9,17 +9,17 @@ using Snet.Framework.Procedures;
 
 namespace Snet.Framework
 {
-    public class SNetCore : SNetCoreProcedures
+    public class SNetCore : SNetMonoBehaviour
     {
         public static bool IsClient = false;
         public static bool IsServer = false;
         public static bool IsHost = false;
 
-        internal static UdpClient UdpClientSocket;
-        internal static TcpClient TcpClientSocket;
+        internal static UdpClient ClientSocket;
+        internal static UdpClient ServerSocket;
 
-        internal static UdpClient UdpServerSocket;
-        internal static TcpClient TcpServerSocket;
+        internal static TcpClient SecureClientSocket;
+        internal static TcpClient SecureServerSocket;
 
         public static bool IsGameServer()
         {
@@ -33,7 +33,18 @@ namespace Snet.Framework
 
         public static bool IsGameHost()
         {
-            return IsHost;
+            if (IsClient && IsServer)
+                return true;
+            return false;
+        }
+
+        public static bool IsUnityServer()
+        {
+#if UNITY_SERVER
+            return true;
+#else
+            return false;
+#endif
         }
     }
 }

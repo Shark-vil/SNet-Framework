@@ -1,47 +1,65 @@
 ﻿using Snet.Framework;
+using Snet.Server;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
 
-public class SNetClient : SNetCore
+namespace Snet.Client
 {
-    public static object IsLock = new object();
-
-    public static IPEndPoint ClientEndPoint = null;
-
-    private static bool IsInit = false;
-
-    public static bool Construct(string Ip, int Port)
+    public class SNetClient : SNetCore
     {
-        if (!IsInit)
+        private static bool IsInit = false;
+
+        public static bool Construct(int Port)
         {
-            ClientEndPoint = new IPEndPoint(IPAddress.Parse(Ip), Port);
+            if (!IsInit)
+            {
+                ClientSocket = new UdpClient(Port);
+                SecureClientSocket = new TcpClient(new IPEndPoint(IPAddress.Loopback, Port));
+                SecureClientSocket.NoDelay = true;;
 
-            UdpClientSocket = new UdpClient(ClientEndPoint);
-            TcpClientSocket = new TcpClient(ClientEndPoint);
-            TcpClientSocket.NoDelay = true;
+                IsInit = true;
+                IsClient = true;
 
-            IsInit = true;
+                Debug.Log("Client is register.");
 
-            return true;
+                return true;
+            }
+            return false;
         }
-        return false;
-    }
 
-    public static bool Destruct()
-    {
-        if (IsInit)
+        public static void StartUp(string Ip, int Port)
         {
-            UdpClientSocket = null;
-            TcpClientSocket.Close();
-            TcpClientSocket = null;
+            ClientSocket.Connect(IPAddress.Parse(Ip), Port);
+            SecureClientSocket.Connect(IPAddress.Parse(Ip), Port);
 
-            IsInit = false;
+            SNetServerProcess.StartProcess();
+            SNetPlayerConnector.Connect();
 
-            return true;
+            Debug.Log("Client running!");
         }
-        return false;
+
+        public static bool Destruct()
+        {
+            if (IsInit)
+            {
+                SNetClientProcess.StopProcess();
+                ClientSocket.Close();
+                ClientSocket = null;
+
+                SecureClientSocket.Close();
+                SecureClientSocket = null;
+
+                IsInit = false;
+                IsClient = false;
+
+                Debug.Log("Client is close!");
+
+                return true;
+            }
+            return false;
+        }
     }
 }

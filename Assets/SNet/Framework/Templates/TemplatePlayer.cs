@@ -15,6 +15,6 @@ namespace Snet.Templates
         [SerializeField]
         public int Port;
         [SerializeField]
-        public IPEndPoint RemoteIp;
+        public IPEndPoint IpPoint;
     }
 }

@@ -1,45 +1,68 @@
 ﻿using Snet.Framework;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
 
-public class SNetServer : SNetCore
+namespace Snet.Server
 {
-    public static IPEndPoint ServerEndPoint = null;
-
-    private static bool IsInit = false;
-
-    public static bool Construct(string Ip, int Port)
+    public class SNetServer : SNetCore
     {
-        if (!IsInit)
+        private static bool IsInit = false;
+
+        public static bool Construct(string Ip, int Port)
         {
-            ServerEndPoint = new IPEndPoint(IPAddress.Parse(Ip), Port);
+            if (!IsInit)
+            {
+                ServerSocket = new UdpClient(new IPEndPoint(IPAddress.Parse(Ip), Port));
 
-            UdpServerSocket = new UdpClient(ServerEndPoint);
-            TcpServerSocket = new TcpClient(ServerEndPoint);
-            TcpServerSocket.NoDelay = true;
+                IsInit = true;
+                IsServer = false;
 
-            IsInit = true;
+                Debug.Log("Server is register.");
 
-            return true;
+                return true;
+            }
+            return false;
         }
-        return false;
-    }
 
-    public static bool Destruct()
-    {
-        if (IsInit)
+        public static void StartUp()
         {
-            UdpServerSocket = null;
-            TcpServerSocket.Close();
-            TcpServerSocket = null;
+            SNetServerProcess.StartProcess();
 
-            IsInit = false;
-
-            return true;
+            Debug.Log("Server running!");
         }
-        return false;
+
+        public static bool Destruct()
+        {
+            if (IsInit)
+            {
+                SNetServerProcess.StopProcess();
+                ServerSocket.Close();
+                ServerSocket = null;
+
+                IsInit = false;
+                IsServer = true;
+
+                Debug.Log("Server is close!");
+
+                return true;
+            }
+            return false;
+        }
+
+        public static string GetParam(string key)
+        {
+            string[] Args = Environment.GetCommandLineArgs();
+
+            for (int i = 0; i < Args.Length; i++)
+                if (Args[i] == key)
+                    if (Args[i + 1] != null)
+                        return Args[i + 1];
+
+            return null;
+        }
     }
 }

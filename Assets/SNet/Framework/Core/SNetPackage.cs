@@ -5,44 +5,47 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
-public class SNetPackage : MonoBehaviour
+namespace Snet.Framework.Utilities
 {
-    public static byte[] Packaging(object Data)
+    public class SNetPackage : MonoBehaviour
     {
-        try
+        public static byte[] Packaging(object Data)
         {
-            BinaryFormatter Formatter = new BinaryFormatter();
-            using (MemoryStream Stream = new MemoryStream())
+            try
             {
-                Formatter.Serialize(Stream, Data);
-                return Stream.ToArray();
+                BinaryFormatter Formatter = new BinaryFormatter();
+                using (MemoryStream Stream = new MemoryStream())
+                {
+                    Formatter.Serialize(Stream, Data);
+                    return Stream.ToArray();
+                }
             }
+            catch (Exception ex)
+            {
+                Debug.LogError($"An exception while packing the object data.\nError code:\n" + ex);
+            }
+            return null;
         }
-        catch (Exception ex)
-        {
-            Debug.LogError($"An exception while packing the object data.\nError code:\n" + ex);
-        }
-        return null;
-    }
 
-    public static T Unpacking<T>(byte[] Data)
-    {
-        try
+        public static T Unpacking<T>(byte[] Data)
         {
-            BinaryFormatter Formatter = new BinaryFormatter();
-            MemoryStream Stream = new MemoryStream(Data);
+            try
+            {
+                BinaryFormatter Formatter = new BinaryFormatter();
+                MemoryStream Stream = new MemoryStream(Data);
 
-            Stream.Seek(0, SeekOrigin.Begin);
-            object Component = Formatter.Deserialize(Stream);
-            Stream.Position = 0;
-            Stream.Close();
+                Stream.Seek(0, SeekOrigin.Begin);
+                object Component = Formatter.Deserialize(Stream);
+                Stream.Position = 0;
+                Stream.Close();
 
-            return (T)Component;
+                return (T)Component;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("An exception while trying to unpack the object data.\nError code:\n" + ex);
+            }
+            return default;
         }
-        catch (Exception ex)
-        {
-            Debug.LogError("An exception while trying to unpack the object data.\nError code:\n" + ex);
-        }
-        return default;
     }
 }
